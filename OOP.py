@@ -20,6 +20,27 @@ class Student:
         else:
             return 'Ошибка'
 
+    def grade(self):
+        if not self.grades:
+            return 0
+        all_grades = [grade for grades in self.grades.values() for grade in grades]
+        return round(sum(all_grades) / len(all_grades), 1)
+
+    def __str__(self):
+        avg_grade = self.grade()
+        courses_in_progress = ', '.join(self.courses_in_progress)
+        finished_courses = ', '.join(self.finished_courses)
+        return (f"Имя: {self.name}\n"
+                f"Фамилия: {self.surname}\n"
+                f"Средняя оценка за домашние задания: {avg_grade}\n"
+                f"Курсы в процессе изучения: {courses_in_progress}\n"
+                f"Завершенные курсы: {finished_courses}")
+
+    def __lt__(self, other):
+        if not isinstance(other, Student):
+            return NotImplemented
+        return self.grade() < other.grade()
+
 
 class Mentor:
     def __init__(self, name, surname):
@@ -42,27 +63,28 @@ class Reviewer(Mentor):
         else:
             return 'Ошибка'
 
+    def __str__(self):
+        return f"Имя: {self.name}\nФамилия: {self.surname}"
+
 
 class Lecturer(Mentor):
     def __init__(self, name, surname):
         super().__init__(name, surname)
         self.grades = {}
 
+    def grade(self):
+        if not self.grades:
+            return 0
+        all_grades = [grade for grades in self.grades.values() for grade in grades]
+        return round(sum(all_grades) / len(all_grades), 1)
 
-best_student = Student('Ruoy', 'Eman', 'your_gender')
-best_student.courses_in_progress += ['Python']
+    def __str__(self):
+        avg_grade = self.grade()
+        return (f"Имя: {self.name}\n"
+                f"Фамилия: {self.surname}\n"
+                f"Средняя оценка за лекции: {avg_grade}")
 
-cool_lecturer = Lecturer('John', 'Doe')
-cool_lecturer.courses_attached += ['Python']
-
-cool_reviewer = Reviewer('Some', 'Buddy')
-cool_reviewer.courses_attached += ['Python']
-
-cool_reviewer.rate_hw(best_student, 'Python', 10)
-cool_reviewer.rate_hw(best_student, 'Python', 9)
-
-best_student.rate_lecturer(cool_lecturer, 'Python', 10)
-best_student.rate_lecturer(cool_lecturer, 'Python', 8)
-
-print("Оценки студента:", best_student.grades)
-print("Оценки лектора:", cool_lecturer.grades)
+    def __lt__(self, other):
+        if not isinstance(other, Lecturer):
+            return NotImplemented
+        return self.grade() < other.grade()
